@@ -7,8 +7,8 @@ device: "cuda" # 也可以设为 "cpu"
 # 训练参数
 training:
   batch_size: 128
-  epochs: 30
-  learning_rate: 0.001
+  epochs: 150
+  learning_rate: 0.0005
 
 # 数据集路径 (指向你的 .batch 文件所在目录)
 data:
@@ -19,8 +19,8 @@ data:
 # 模型参数
 model:
   num_classes: 10
-  dropout_rate: 0.25
-  classifier_dropout: 0.5
+  dropout_rate: 0.3
+  classifier_dropout: 0.6
 
 # 数据增强
 data_augmentation:
