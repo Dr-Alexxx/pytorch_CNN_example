@@ -1,0 +1,38 @@
+# config.yaml
+# 超参数配置文件 (CIFAR-10 原始 .batch 格式)
+
+# 设备设置
+device: "cuda" # 也可以设为 "cpu"
+
+# 训练参数
+training:
+  batch_size: 64
+  epochs: 25
+  learning_rate: 0.001
+
+# 数据集路径 (指向你的 .batch 文件所在目录)
+data:
+  root: "cifar-10-batches-py" # 修改为你本地存放 .batch 文件的路径
+  num_workers: 2
+  download: true # 因为我们已经有 .batch 文件，不需要下载
+
+# 模型参数
+model:
+  num_classes: 10
+  dropout_rate: 0.25
+  classifier_dropout: 0.5
+
+# 数据增强
+data_augmentation:
+  random_crop_padding: 4
+  random_hflip_prob: 0.5
+
+# 数据标准化参数 (CIFAR-10)
+normalization:
+  mean: [0.4914, 0.4822, 0.4465]
+  std: [0.2470, 0.2435, 0.2616]
+
+# 保存与加载
+saving:
+  model_path: "cifar10_cnn.pth"
+  plot_path: "cifar10_training_curve.png"
