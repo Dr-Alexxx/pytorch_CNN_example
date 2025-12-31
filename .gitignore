@@ -1,5 +1,3 @@
-/cifar10_resnet_optimized_best_final.pth
-
-/cifar10_resnet_optimized_best.pth
-
-/cifar10_resnet_optimized_training_curve.png
+*.pth
+*.png
+cifar-10-batches-py/
