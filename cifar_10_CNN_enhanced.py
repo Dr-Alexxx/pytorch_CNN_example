@@ -27,7 +27,6 @@ def main():
     # ----------------------------
     # 0. 环境初始化与配置加载
     # ----------------------------
-    # 修复 Bug: 将检查移入 main 函数，防止多进程重复打印
     compile_available = check_compile_availability()
 
     with open('config_optimized.yaml', 'r', encoding='utf-8') as f:
@@ -36,7 +35,7 @@ def main():
     device = torch.device(cfg['device'] if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
-    # [优化 1] 开启 CuDNN 自动调优 (针对固定尺寸输入加速显著)
+    # CuDNN 自动调优 (针对固定尺寸输入加速显著)
     if device.type == 'cuda':
         torch.backends.cudnn.benchmark = True
         print("Creating optimized CuDNN execution plan...")
@@ -70,7 +69,7 @@ def main():
     transform_train = transforms.Compose([
         transforms.RandomCrop(32, padding=random_crop_padding, padding_mode='reflect'),
         transforms.RandomHorizontalFlip(p=random_hflip_prob),
-        # transforms.AutoAugment(transforms.AutoAugmentPolicy.CIFAR10), # 可选：自动增强
+        transforms.AutoAugment(transforms.AutoAugmentPolicy.CIFAR10), # 可选：自动增强
         transforms.ToTensor(),
         transforms.Normalize(normalize_mean, normalize_std),
         transforms.RandomErasing(p=0.1, scale=(0.02, 0.33), ratio=(0.3, 3.3)),
@@ -83,7 +82,7 @@ def main():
 
     trainset = torchvision.datasets.CIFAR10(root=data_root, train=True, download=download_data,
                                             transform=transform_train)
-    # persistent_workers=True 可以减少每个 epoch 重新创建进程的开销
+    persistent_workers=True # 可选 可以减少每个 epoch 重新创建进程的开销
     trainloader = DataLoader(trainset, batch_size=batch_size, shuffle=True,
                              num_workers=num_workers, pin_memory=True, persistent_workers=(num_workers > 0))
 
@@ -156,19 +155,19 @@ def main():
     # ----------------------------
     model = OptimizedCNN().to(device)
 
-    # [优化 2] 使用 Channels Last 内存格式 (Tensor Core 友好，加速 10-20%)
+    # 使用 Channels Last 内存格式 (Tensor Core 友好，加速 10-20%)
     model = model.to(memory_format=torch.channels_last)
 
     if compile_available:
         print("Torch compile available but skipped (as per config).")
 
-    # [优化 3] 标签平滑 (Label Smoothing) - 防止过拟合
+    # 标签平滑 (Label Smoothing) - 防止过拟合
     criterion = nn.CrossEntropyLoss(label_smoothing=0.1)
 
     optimizer = optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
 
-    # [优化 4] 动态设置 AMP 设备类型
+    # 动态设置 AMP 设备类型
     use_amp = (device.type == 'cuda')
     scaler = amp_torch.GradScaler(device.type, enabled=use_amp)
 
@@ -181,7 +180,7 @@ def main():
         correct = 0
         total = 0
 
-        # [优化 5] TQDM 进度条
+        # TQDM 进度条
         # leave=False 表示跑完该 Epoch 后进度条消失，保持控制台整洁
         loop = tqdm(trainloader, desc=f'Epoch [{epoch_index}/{epochs}]', leave=False)
 

@@ -2,8 +2,8 @@
 device: "cuda"
 
 training:
-  batch_size: 256 # 你可以根据显存情况尝试 256
-  epochs: 200 # 训练轮数
+  batch_size: 256 # 根据显存情况决定128或256（推荐）
+  epochs: 200 # 训练轮数（150-200推荐）
   learning_rate: 0.001 # 初始学习率
   weight_decay: 0.05 # 权重衰减
 
