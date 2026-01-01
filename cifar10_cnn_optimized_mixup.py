@@ -140,14 +140,14 @@ def main():
 
     trainset = torchvision.datasets.CIFAR10(root=cfg['data']['root'], train=True, download=True, transform=transform_train)
     
-    # 针对 13600KF 和 Windows 优化的 DataLoader
+    # DataLoader
     trainloader = DataLoader(
         trainset, 
         batch_size=batch_size, 
         shuffle=True, 
         num_workers=int(cfg['data']['num_workers']), 
         pin_memory=True,
-        persistent_workers=True  # <--- 新增：保持子进程常驻，减少 Epoch 切换开销
+        persistent_workers=True  # 保持子进程常驻
     )
 
     testset = torchvision.datasets.CIFAR10(root=cfg['data']['root'], train=False, download=True, 
